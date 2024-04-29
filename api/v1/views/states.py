@@ -5,14 +5,16 @@ from api.v1.views import app_views
 from flask import jsonify, abort, make_response, request
 from models import storage, state
 
+
 @app_views.route("/states", strict_slashes=False)
 def get_states():
     """retrieves the list of all state objects"""
     all_states = storage.all("State").values()
     list_states = []
-    for state in all_states:
-        list_states.append(state.to_dict())
+    for state_obj in all_states:
+        list_states.append(state_obj.to_dict())
     return jsonify(list_states)
+
 
 @app_views.route("/states/<state_id>", strict_slashes=False)
 def get_state(state_id):
@@ -21,6 +23,7 @@ def get_state(state_id):
     if not state:
         abort(404)
     return jsonify(state.to_dict())
+
 
 @app_views.route("/states/<state_id>", methods=['DELETE'],
                  strict_slashes=False)
@@ -33,6 +36,7 @@ def delete(state_id):
     storage.save()
     return make_response(jsonify({}), 200)
 
+
 @app_views.route("/states/", methods=['POST'], strict_slashes=False)
 def post_states():
     """Creates a state"""
@@ -44,6 +48,7 @@ def post_states():
     instance = state(**results)
     instance.save()
     return make_response(jsonify(instance.to_dict(), 201))
+
 
 @app_views.route("/state/<state_id>", methods=['PUT'],
                  strict_slashes=False)
@@ -64,13 +69,3 @@ def put_state(state_id):
         storage.save()
         data = state.to_dict()
         return make_response(jsonify(data), 200)
-
-
-
-    
-
-        
-
-
-
-
