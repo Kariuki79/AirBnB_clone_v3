@@ -34,11 +34,13 @@ def get_method_state(state_id):
 def del_method(state_id):
     """ delete state object by id"""
     state = storage.get(State, state_id)
-    if state is None:
-        abort(404)
-    storage.delete(state)
-    storage.save()
-    return make_response({}, 200)
+
+    if state is not None:
+        storage.delete(state)
+        storage.save()
+        return make_response({}, 200)
+
+    abort(404)
 
 
 @app_views.route('/states/', methods=['POST'], strict_slashes=False)
