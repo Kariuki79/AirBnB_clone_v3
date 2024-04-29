@@ -36,8 +36,8 @@ def del_method(state_id):
 
 
 @app_views.route('/states/', methods=['POST'], strict_slashes=False)
-def create_obj():
-    """ creating a n"""
+def post_obj():
+    """ creating a state"""
     if not request.get_json():
         return make_response(jsonify({"error": "Not a JSON"}), 400)
     if 'name' not in request.get_json():
@@ -50,8 +50,8 @@ def create_obj():
 
 @app_views.route('/states/<string:state_id>', methods=['PUT'],
                  strict_slashes=False)
-def post_method(state_id):
-    """ post method """
+def put_method(state_id):
+    """ updates a state object"""
     if not request.get_json():
         return make_response(jsonify({"error": "Not a JSON"}), 400)
     obj = storage.get(State, state_id)
@@ -61,4 +61,4 @@ def post_method(state_id):
         if key not in ['id', 'created_at', 'updated_at']:
             setattr(obj, key, value)
     storage.save()
-    return jsonify(obj.to_dict())
+    return make_response(jsonify(obj.to_dict()), 200)
