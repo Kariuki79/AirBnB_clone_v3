@@ -60,7 +60,7 @@ def post_obj():
 @app_views.route('/states/<string:state_id>', methods=['PUT'],
                  strict_slashes=False)
 def put_method(state_id):
-    """ updates a state object"""
+    """ updates a state object."""
     if not request.get_json():
         return make_response(jsonify({"error": "Not a JSON"}), 400)
     obj = storage.get(State, state_id)
