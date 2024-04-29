@@ -32,7 +32,7 @@ def del_method(state_id):
         abort(404)
     state.delete()
     storage.save()
-    return jsonify({})
+    return make_response({}, 200)
 
 
 @app_views.route('/states/', methods=['POST'], strict_slashes=False)
@@ -45,7 +45,7 @@ def create_obj():
     js = request.get_json()
     obj = State(**js)
     obj.save()
-    return jsonify(obj.to_dict()), 201
+    return make_response(obj.to_dict(), 201)
 
 
 @app_views.route('/states/<string:state_id>', methods=['PUT'],
