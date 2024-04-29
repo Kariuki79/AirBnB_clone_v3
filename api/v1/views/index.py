@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """index module"""
 
-from flask import jsonify
+from flask import jsonify, make_response
 from models import storage
 from api.v1.views import app_views
 
@@ -9,7 +9,7 @@ from api.v1.views import app_views
 @app_views.route("/status", strict_slashes=False)
 def status():
     """Return status ok"""
-    return jsonify({'status': 'ok'})
+    return jsonify({"status": "OK"})
 
 
 @app_views.route("/stats", strict_slashes=False)
