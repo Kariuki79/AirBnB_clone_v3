@@ -60,14 +60,17 @@ def post_obj():
 @app_views.route('/states/<string:state_id>', methods=['PUT'],
                  strict_slashes=False)
 def put_method(state_id):
-    """ updates a state object."""
-    if not request.get_json():
-        return make_response(jsonify({"error": "Not a JSON"}), 400)
-    obj = storage.get(State, state_id)
-    if obj is None:
-        abort(404)
-    for key, value in request.get_json().items():
-        if key not in ['id', 'created_at', 'updated_at']:
-            setattr(obj, key, value)
-    storage.save()
-    return make_response(jsonify(obj.to_dict()), 200)
+    if not request.is_json:
+        abort(400, description="Not a JSON")
+
+    request_data = request.get_json()
+    state = storage.get(State, state_id)
+
+    if state is not None:
+        for k, v in request_data.items():
+            if k not in ['id', 'updated_at', 'created_at']:
+                setattr(state, k, v)
+        state.save()
+        return state.to_dict()
+
+    abort(404)
