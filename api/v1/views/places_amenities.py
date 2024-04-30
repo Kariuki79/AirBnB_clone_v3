@@ -6,7 +6,7 @@ from models import storage
 from models.place import Place
 from models.amenity import Amenity
 from api.v1.views import app_views
-from flask import jsonify, abort, make_response, request
+from flask import jsonify, abort, make_response
 
 
 @app_views.route('/places/<place_id>/amenities', methods=['GET'],
