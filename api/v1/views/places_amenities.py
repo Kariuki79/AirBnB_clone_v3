@@ -3,13 +3,13 @@
 
 from os import environ
 from models import storage
-from models.place import place
+from models.place import Place
 from models.amenity import Amenity
 from api.v1.views import app_views
 from flask import jsonify, abort, make_response, request
 
 
-@app_views.route('places/<place_id>/amenities', methods=['GET'],
+@app_views.route('/places/<place_id>/amenities', methods=['GET'],
                  strict_slashes=False)
 def get_amenities(place_id):
     """
@@ -32,8 +32,8 @@ def get_amenities(place_id):
 
 @app_views.route('/places/<place_id>/amenities/<amenity_id>',
                  methods=['DELETE'], strict_slashes=False)
-def delete_amenity(place_id, amenity_id):
-    """Deletes a Amenity object to a place"""
+def remove_amenity_from_place(place_id, amenity_id):
+    """Removes a Amenity object from a Place"""
     place = storage.get(Place, place_id)
 
     if not place:
