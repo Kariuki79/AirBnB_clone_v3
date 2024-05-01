@@ -95,8 +95,8 @@ class DBStorage:
         Attributes:
             cls: class (optional)
         Return: The number of objects in storage matching the
-        given class.If no class is passed, returns the
-        count of all objects in storage.
+        given class. If no class is passed, returns the count
+        of all objects in storage
         """
         data = self.all(cls)
         if cls in classes.values():

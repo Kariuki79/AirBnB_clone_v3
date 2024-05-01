@@ -1,76 +1,81 @@
 #!/usr/bin/python3
 """Handles all default RESTFul API actions"""
-
 from api.v1.views import app_views
-from flask import jsonify, abort, make_response, request
-from models import storage, state
+from flask import jsonify, abort, request, make_response
+from models import storage
+from models.state import State
 
-@app_views.route("/states", strict_slashes=False)
-def get_states():
-    """retrieves the list of all state objects"""
-    all_states = storage.all("State").values()
-    list_states = []
-    for state in all_states:
-        list_states.append(state.to_dict())
-    return jsonify(list_states)
 
-@app_views.route("/states/<state_id>", strict_slashes=False)
-def get_state(state_id):
-    """Retrives a state object by id"""
-    state = storage.get("State", state_id)
-    if not state:
-        abort(404)
-    return jsonify(state.to_dict())
+@app_views.route('/states', methods=['GET'], strict_slashes=False)
+def get_all():
+    """Retrieves the list of all state objects"""
+    all_objs = []
 
-@app_views.route("/states/<state_id>", methods=['DELETE'],
+    for state in storage.all("State").values():
+        all_objs.append(state.to_dict())
+
+    return jsonify(all_objs)
+
+
+@app_views.route('/states/<string:state_id>', methods=['GET'],
                  strict_slashes=False)
-def delete(state_id):
-    """Deletes a state object"""
-    state = storage.get("State", state_id)
-    if not state:
-        abort(404)
-    storage.delete(state)
-    storage.save()
-    return make_response(jsonify({}), 200)
+def get_method_state(state_id):
+    """Retrieves a state object by id"""
+    all_states = storage.all("State")
 
-@app_views.route("/states/", methods=['POST'], strict_slashes=False)
-def post_states():
-    """Creates a state"""
-    if not request.get_json():
-        abort(400, "Not a JSON")
-    if 'name' not in request.get_json():
-        abort(400, "Missing name")
-    results = request.get_json()
-    instance = state(**results)
-    instance.save()
-    return make_response(jsonify(instance.to_dict(), 201))
+    for state in all_states.values():
+        if state.id == state_id:
+            return jsonify(state.to_dict())
+    abort(404)
 
-@app_views.route("/state/<state_id>", methods=['PUT'],
+
+@app_views.route('/states/<string:state_id>', methods=['DELETE'],
                  strict_slashes=False)
-def put_state(state_id):
-    """Updates a state"""
-    state = storage.get("State", state_id)
-    if not state:
-        abort(404)
-    results = request.get_json()
-    if results is None:
-        abort(400, "Not a JSON")
-    else:
-        for key, value in results.items():
-            if key in ['id', 'created_at', 'updated_at']:
-                pass
-            else:
-                setattr(state, key, value)
+def del_method(state_id):
+    """ delete state object by id"""
+    state = storage.get(State, state_id)
+
+    if state is not None:
+        storage.delete(state)
         storage.save()
-        data = state.to_dict()
-        return make_response(jsonify(data), 200)
+        return make_response({}, 200)
+
+    abort(404)
 
 
+@app_views.route("/states", methods=["POST"], strict_slashes=False)
+def create_state():
+    """
+    creates a state
+    """
+    if not request.is_json:
+        abort(400, description='Not a JSON')
 
-    
+    request_body = request.get_json()
 
-        
+    if 'name' not in request_body:
+        abort(400, description='Missing name')
+
+    new_state = State(**request_body)
+    storage.new(new_state)
+    storage.save()
+    return make_response(new_state.to_dict(), 201)
 
 
+@app_views.route('/states/<string:state_id>', methods=['PUT'],
+                 strict_slashes=False)
+def put_method(state_id):
+    if not request.is_json:
+        abort(400, description="Not a JSON")
 
+    request_data = request.get_json()
+    state = storage.get(State, state_id)
 
+    if state is not None:
+        for k, v in request_data.items():
+            if k not in ['id', 'updated_at', 'created_at']:
+                setattr(state, k, v)
+        state.save()
+        return state.to_dict()
+
+    abort(404)
