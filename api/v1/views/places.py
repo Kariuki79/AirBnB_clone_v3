@@ -72,6 +72,27 @@ def create_place(city_id):
     return make_response(new_place.to_dict(), 201)
 
 
+@app_views.route('/places/<place_id>', methods=['PUT'], strict_slashes=False)
+def update_place(place_id):
+    """Updates a Place object by its ID"""
+    place = storage.get(Place, place_id)
+    if place is None:
+        abort(404)
+
+    if not request.is_json:
+        abort(400, description='Not a JSON')
+
+    request_data = request.get_json()
+    for key in ['id', 'user_id', 'city_id', 'created_at', 'updated_at']:
+        request_data.pop(key, None)
+
+    for key, value in request_data.items():
+        setattr(place, key, value)
+
+    storage.save()
+    return jsonify(place.to_dict()), 200
+
+
 @app_views.route('/places_search', methods=['POST'],
                  strict_slashes=False)
 def search_places_by_id():
