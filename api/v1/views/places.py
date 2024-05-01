@@ -128,7 +128,7 @@ def search_places_by_id():
                             list_places.append(place)
 
     if cities:
-        city_obj = [storage.get(City, c_id) for c_id in cities]
+        city_obj = [storage.get(City, city_id) for city_id in cities]
         for city in city_obj:
             if city:
                 for place in city.places:
@@ -144,9 +144,9 @@ def search_places_by_id():
                                for am in amenities_obj])]
 
     places = []
-    for p in list_places:
-        d = p.to_dict()
-        d.pop('amenities', None)
-        places.append(d)
+    for place_obj in list_places:
+        place_dict = place_obj.to_dict()
+        place_dict.pop('amenities', None)
+        places.append(place_dict)
 
     return jsonify(places)
